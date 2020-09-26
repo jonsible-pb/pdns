@@ -1,0 +1,29 @@
+- hosts: all
+  become: true
+  tasks:
+    - debug:
+        var: pdns_mysql_packages
+    - import_role:
+        name: PowerDNS.pdns
+      vars:
+        pdns_install_repo: "{{ pdns_auth_powerdns_repo_master }}"
+        pdns_mysql_packages:
+          - default-mysql-client
+          - python3-mysqldb
+        pdns_config:
+          master: true
+          slave: false
+          local-address: "{{ ansible_default_ipv4.address }}"
+        pdns_backends:
+          gmysql:
+            host: 127.0.0.1
+            port: 3306
+            user: powerdns
+            password: "{{ powerdns_password }}"
+            dbname: pdns
+        pdns_mysql_databases_credentials:
+          gmysql:
+            priv_user: root
+            priv_password: "{{ mysql_root_password }}"
+            priv_host:
+              - "%"
